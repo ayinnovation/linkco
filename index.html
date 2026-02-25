@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="Author" content="Adelabu Ayomide Oladiran"/>
+  <meta name="description"content="LinkCo is a platform students looking for roomates and hostels ,it serves as an way to inform student's about the hostel they have in mind;there's a grading system for hostels and roomates to help students make informed decisions."/>
+  <meta name="keywords" content="LinkCo, Room mates, Student Housing, Hostel finder , Room mates Nigeria, Student accommodation , University housing"/>
+  <title>LinkCo — Find Roommates</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div id="loader" class="loader hidden">
+  <div class="spinner"></div>
+  <p>Please wait…</p>
+</div>
+
+  <header class="topbar">
+    <h1>LinkCo</h1>
+    <nav id="nav-guest">
+      <button id="btn-show-register">Register</button>
+      <button id="btn-show-login">Login</button>
+      <button id="btn-continue-guest">Continue as Guest</button>
+    </nav>
+    <nav id="nav-user" class="hidden">
+      <span id="welcome-user"></span>
+      <button id="btn-create-flyer">Create Flyer</button>
+      <button id="btn-search">Search</button>
+      <button id="btn-logout">Logout</button>
+<button id="show-hidden-flyers-btn">My Hidden Flyers</button>
+
+    </nav>
+  </header>
+  <div id="network-status" class="network-status hidden">
+    ⚠️ You are offline. Some features may not work.
+  </div>
+  
+  <main>
+    <!-- Auth / Register -->
+    <section id="auth-section" class="card">
+      <div id="register-form" class="auth-form hidden">
+        <h2>Register</h2>
+        <input id="reg-name" placeholder="Full name" />
+        <input id="reg-phone" placeholder="Phone number (e.g. +234...)" />
+        <input id="reg-password" type="password" placeholder="Password" />
+        <label><input id="reg-is-student" type="checkbox" /> I'm a student</label>
+        <div id="reg-student-doc-wrapper" class="hidden">
+          <label>Student document (image):</label>
+          <input id="reg-student-doc" type="file" accept="image/*" />
+          <img id="student-doc-preview" class="hidden image-preview" alt="Student document preview" />
+        </div>
+        <button id="btn-register">Create account</button>
+      </div>
+
+      <div id="login-form" class="auth-form hidden">
+        <h2>Login</h2>
+        <input id="login-phone" placeholder="Phone number" />
+        <input id="login-password" type="password" placeholder="Password" />
+        <button id="btn-login">Login</button>
+      </div>
+
+      <div id="guest-welcome">
+        <h2>Welcome to LinkCo</h2>
+        <p>Create or find roommates easily. Start by registering.</p>
+      </div>
+    </section>
+
+    <!-- Create flyer -->
+    <section id="flyer-section" class="card hidden">
+      <h2>Create Flyer (₦300)</h2>
+      <div class="form-grid">
+        <input id="f-title" placeholder="Short title (e.g. 3-bed near campus)" />
+        <input id="f-location" placeholder="Location (e.g. Malete)" />
+        <input id="f-total-price" type="number" placeholder="Total price (₦)" />
+        <input id="f-per-person" type="number" placeholder="Price per person (₦)" />
+        <input id="f-slots-needed" type="number" placeholder="Number of people wanted (2 or 3 etc.)" />
+        <input id="f-contact" placeholder="Owner contact number (WhatsApp link uses this)" />
+
+        <div class="image-upload-group">
+          <label>Hostel image:</label>
+          <input id="f-hostel-image" type="file" accept="image/*" />
+          <img id="hostel-image-preview" class="hidden image-preview" alt="Hostel preview" />
+        </div>
+
+        <div class="image-upload-group">
+          <label>Your profile image:</label>
+          <input id="f-profile-image" type="file" accept="image/*" />
+          <img id="profile-image-preview" class="hidden image-preview" alt="Profile preview" />
+        </div>
+
+        <label>Likes / Preferences (comma separated):</label>
+        <input id="f-preferences" placeholder="e.g. quiet,non-smoker,early-bird" />
+      </div>
+
+      <p class="muted">You will be charged ₦300 to upload this flyer (simulated).</p>
+      <div class="btn-group">
+  <button id="btn-pay-create">Pay ₦300 & Create Flyer (simulate)</button>
+  <button id="btn-cancel-create" class="secondary">Cancel</button>
+</div>
+
+<div class="return-btn-wrapper">
+  <button id="btn-return-home" class="hidden">Return Home</button>
+</div>
+    </section>
+
+    <!-- Search -->
+    <section id="search-section" class="card hidden">
+      <h2>Search Roommates (Requires search code)</h2>
+      <div id="search-code-wrapper">
+        <p>Buy a 7-day search access for ₦900 (simulated) to receive a code.</p>
+   
+   
+        <button id="btn-pay-search">Pay ₦900 & Get Code (simulate)</button>
+        <div class="or">OR</div>
+        <input id="search-code-input" placeholder="Enter search code" />
+        <button id="btn-activate-code">Activate code</button>
+  
+        <div id="active-code-info" class="muted hidden"></div>
+  
+      </div>
+      <div id="search-form" class="hidden">
+        <h3>Filters</h3>
+        <input id="s-max-fund" type="number" placeholder="Max per-person fund (₦)" />
+        <input id="s-people" type="number" placeholder="Number of people in room (2 or 3)" />
+        <input id="s-location" placeholder="Location" />
+        <input id="s-preferences" placeholder="Desired preferences (comma separated)" />
+        <label><input id="s-student-only" type="checkbox" /> Student only</label>
+        <button id="btn-run-search">Run Search</button>
+      </div>
+
+  <button id="s-btn-return-home" class="hidden">Return Home</button>
+
+      <div id="search-results"></div>
+    </section>
+
+    <!-- Feed (public flyers) -->
+    <section id="feed-section" class="card">
+      <h2>Flyer Feed</h2>
+      <div id="feed-list"></div>
+    </section>
+  
+  </main>
+<section id="hidden-flyers-section" style="display:none;">
+  <h3>My Pulled Down Flyers</h3>
+  <div id="hidden-flyers-list"></div>
+  <button onclick="showFeed()">⬅ Back to Feed</button>
+  
+</section>
+  <footer class="footer">
+    <strong>LinkCo — Student Housing Made Simple</strong>
+  </footer>
+
+  <!-- Main App -->
+  <script src="app.js"></script>
+</body>
+</html>
