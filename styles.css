@@ -428,3 +428,63 @@ button:disabled {
     font-size: 1.3rem;
   }
 }
+/* ===== Admin Styles ===== */
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+#btn-exit-admin {
+  background: #dc2626;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.admin-analytics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-analytics .stat {
+  background: #f3f4f6;
+  padding: 14px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.admin-request-card {
+  border: 1px solid #e5e7eb;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.admin-request-card button {
+  margin-right: 8px;
+}
+.stat-card {
+  background: linear-gradient(135deg, #0b3d91, #1e3a8a);
+  color: white;
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.stat-card h4 {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.stat-card p {
+  font-size: 22px;
+  font-weight: bold;
+}

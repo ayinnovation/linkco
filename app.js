@@ -3,7 +3,8 @@
 // ===============================
 
 // --- SELECT IMPORTANT ELEMENTS ---
-
+const adminSection = document.getElementById("admin-section");
+const adminRequestsDiv = document.getElementById("admin-req");
 const navGuest = document.getElementById("nav-guest");
 const navUser = document.getElementById("nav-user");
 const welcomeUser = document.getElementById("welcome-user");
@@ -15,7 +16,7 @@ const authSection = document.getElementById("auth-section");
 const hiddenFlyersSection = document.getElementById("hidden-flyers-section");
 const hiddenFlyersList = document.getElementById("hidden-flyers-list");
 const showHiddenFlyersBtn = document.getElementById("show-hidden-flyers-btn");
-
+const btnExitAdmin = document.getElementById("btn-exit-admin");
 
 const feedSection = document.getElementById("feed-section");
 const flyerSection = document.getElementById("flyer-section");
@@ -160,7 +161,17 @@ function generateId() {
 // 🧍 AUTH LOGIC
 // --------------------------
 let users = loadFromStorage("users", []);
-const Admin_user = {username:admin,password:admin123};
+// Ensure admin exists
+if (!users.some(u => u.role === "admin")) {
+  users.push({
+    id: "admin-1",
+    name: "Administrator",
+    phone: "0000",
+    password: "admin123",
+    role: "admin"
+  });
+  saveToStorage("users", users);
+}
 let currentUser = loadFromStorage("currentUser", null);
 
 function registerUser() {
@@ -180,33 +191,253 @@ function registerUser() {
     return;
   }
 
-  const newUser = { id: generateId(), name, phone, password, isStudent, studentDoc };
+  const newUser = { id: generateId(), name, phone, password, isStudent, studentDoc, role:"user" };
   users.push(newUser);
   saveToStorage("users", users);
 
   showNotice("Registration successful! You can now log in.", {type: 'success'});
   showLogin();
 }
+// Admin dashboard logic
+function showAdminDashboard() {
+  if (!currentUser || currentUser.role !== "admin") {
+    showNotice("Unauthorized access", { type: "error" });
+    return;
+  }
+  authSection.classList.add("hidden");
+  feedSection.classList.add("hidden");
+  flyerSection.classList.add("hidden");
+  searchSection.classList.add("hidden");
+  navGuest.classList.add("hidden");
+  adminSection.classList.remove("hidden");
+  renderAdminAnalytics();
+  renderAdminRequests();
+}
+function renderAdminRequests() {
+  const requests = JSON.parse(localStorage.getItem("requests") || "[]");
+  const flyers = JSON.parse(localStorage.getItem("flyers") || "[]");
 
+  adminRequestsDiv.innerHTML = "";
+
+  if (requests.length === 0) {
+    adminRequestsDiv.innerHTML = "<p>No payment requests yet.</p>";
+    return;
+  }
+
+  requests.forEach(req => {
+    const flyer = flyers.find(f => f.id === req.flyerId);
+    if (!flyer) return;
+
+    const div = document.createElement("div");
+    div.style.border = "1px solid #ccc";
+    div.style.padding = "10px";
+    div.style.marginBottom = "10px";
+
+    div.innerHTML = `
+      <p><b>User:</b> ${req.user}</p>
+      <p><b>Phone:</b> ${req.phone}</p>
+      <p><b>Room:</b> ${flyer.title}</p>
+      <p><b>Status:</b> ${req.status || "pending"}</p>
+    `;
+
+    if (!req.status || req.status === "pending") {
+      const approveBtn = document.createElement("button");
+      approveBtn.textContent = "Approve";
+      approveBtn.onclick = () => approveRequest(req);
+
+      const rejectBtn = document.createElement("button");
+      rejectBtn.textContent = "Reject";
+      rejectBtn.onclick = () => rejectRequest(req);
+
+      div.appendChild(approveBtn);
+      div.appendChild(rejectBtn);
+    }
+
+    adminRequestsDiv.appendChild(div);
+  });
+}
+function renderAdminAnalytics() {
+  const flyers = JSON.parse(localStorage.getItem("flyers") || "[]");
+  const users = JSON.parse(localStorage.getItem("users") || "[]");
+  const requests = JSON.parse(localStorage.getItem("requests") || "[]");
+
+  const totalUsers = users.filter(u => u.role !== "admin").length;
+  const totalFlyers = flyers.length;
+  const activeFlyers = flyers.filter(f => f.isActive).length;
+  const pendingRequests = requests.filter(r => r.status === "pending").length;
+  const approvedRequests = requests.filter(r => r.status === "approved").length;
+
+  const revenueFromFlyers = totalFlyers * 300;
+  const revenueFromSearch = approvedRequests * 900;
+  const totalRevenue = revenueFromFlyers + revenueFromSearch;
+
+  const fulfillmentRate = flyers.length > 0
+    ? Math.round(
+        (flyers.filter(f => f.roommatesFound >= f.roommatesNeeded).length / flyers.length) * 100
+      )
+    : 0;
+
+  const analyticsDiv = document.getElementById("admin-analytics");
+
+  analyticsDiv.innerHTML = `
+    <div class="stat-card">
+      <h4>Total Users</h4>
+      <p>${totalUsers}</p>
+    </div>
+
+    <div class="stat-card">
+      <h4>Total Revenue</h4>
+      <p>₦${totalRevenue}</p>
+    </div>
+
+    <div class="stat-card">
+      <h4>Active Flyers</h4>
+      <p>${activeFlyers} / ${totalFlyers}</p>
+    </div>
+
+    <div class="stat-card">
+      <h4>Pending Requests</h4>
+      <p>${pendingRequests}</p>
+    </div>
+
+    <div class="stat-card">
+      <h4>Fulfillment Rate</h4>
+      <p>${fulfillmentRate}%</p>
+    </div>
+
+    <div class="stat-card">
+      <h4>Approved Joinings</h4>
+      <p>${approvedRequests}</p>
+    </div>
+  `;
+}
+function approveRequest(request) {
+  let requests = JSON.parse(localStorage.getItem("requests") || "[]");
+  let flyers = JSON.parse(localStorage.getItem("flyers") || "[]");
+
+  const reqIndex = requests.findIndex(r => r.time === request.time);
+  const flyer = flyers.find(f => f.id === request.flyerId);
+
+  if (!flyer) return;
+
+  // 1️⃣ mark approved
+  requests[reqIndex].status = "approved";
+
+  // 2️⃣ increment roommatesFound
+  flyer.roommatesFound++;
+
+  // 3️⃣ auto-pull if quota met
+  if (flyer.roommatesFound >= flyer.roommatesNeeded) {
+    flyer.isActive = false;
+  }
+  // Notify user
+  let notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+  
+  notifications.push({
+    id: generateId(),
+    phone: request.phone,
+    message: "🎉 Your request has been approved!",
+    time: Date.now(),
+    read: false
+  });
+  
+  localStorage.setItem("notifications", JSON.stringify(notifications));
+  localStorage.setItem("requests", JSON.stringify(requests));
+  localStorage.setItem("flyers", JSON.stringify(flyers));
+
+  renderAdminRequests();
+  renderFeed();
+}
+//admin exit logic
+safeOn(btnExitAdmin,"click",()=>{
+  adminSection.classList.add("hidden");
+  
+  authSection.classList.remove("hidden");});
+  //---------end of admin exit logic------
+function renderNotifications() {
+  const panel = document.getElementById("notification-panel");
+  let notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+
+  const myNotes = notifications.filter(n => 
+    n.phone === currentUser.phone && !n.read
+  );
+
+  if (myNotes.length === 0) {
+    panel.classList.add("hidden");
+    return;
+  }
+
+  panel.classList.remove("hidden");
+  panel.innerHTML = "<h4>Notifications</h4>";
+
+  myNotes.forEach(note => {
+    const div = document.createElement("div");
+    div.style.borderBottom = "1px solid #ddd";
+    div.style.padding = "6px 0";
+
+    div.innerHTML = `
+      <p>${note.message}</p>
+      <button data-id="${note.id}">Clear</button>
+    `;
+
+    div.querySelector("button").onclick = () => {
+      clearNotification(note.id);
+    };
+
+    panel.appendChild(div);
+  });
+}
+function clearNotification(id) {
+  let notifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+
+  notifications = notifications.filter(n => n.id !== id);
+
+  localStorage.setItem("notifications", JSON.stringify(notifications));
+
+  renderNotifications();
+}
+function rejectRequest(request) {
+  let requests = JSON.parse(localStorage.getItem("requests") || "[]");
+
+  const reqIndex = requests.findIndex(r => r.time === request.time);
+  requests[reqIndex].status = "rejected";
+
+  localStorage.setItem("requests", JSON.stringify(requests));
+
+  renderAdminRequests();
+}//end of admin logic
+
+//login function
 function loginUser() {
   const phone = document.getElementById("login-phone").value.trim();
   const password = document.getElementById("login-password").value.trim();
 
   const user = users.find(u => u.phone === phone && u.password === password);
+
   if (!user) {
-    showNotice("Invalid phone or password", {type: 'error'});
+    showNotice("Invalid phone or password", { type: "error" });
     return;
   }
 
+  // ✅ Set session first
   currentUser = user;
-  saveToStorage("currentUser", currentUser);
-  showFeed();
+  localStorage.setItem("currentUser", JSON.stringify(currentUser));
+
+  // ✅ Role-based routing
+  if (user.role === "admin") {
+    showAdminDashboard();
+  } else {
+    showFeed();
+  }
+
+  showNotice("Login successful", { type: "success" });
 }
 
 function logoutUser() {
   currentUser = null;
   localStorage.removeItem("currentUser");
   showAuth();
+  adminSection.classList.add("hidden");
 }
 
 // --------------------------
@@ -294,7 +525,7 @@ function createFlyer() {
     user: currentUser.name,
     userPhone:currentUser.phone,
     isActive:true, 
-    CreatedAt: Date.now.toString(),
+    CreatedAt: Date.now(),
     code: Math.random().toString(36).substring(2, 8).toUpperCase(),
     roommatesNeeded,
     roommatesFound
@@ -317,7 +548,7 @@ function renderFeed() {
   flyers.forEach(f => {
     // Skip hidden flyers
     if (!f.isActive) return;
-
+  const slotsLeft = Math.max(0, f.roommatesNeeded - f.roommatesFound);
     const flyerEl = document.createElement("div");
     flyerEl.className = "flyer";
     flyerEl.innerHTML = `
@@ -333,12 +564,33 @@ function renderFeed() {
         <span>By ${f.user}</span>
       </div>
       <a href="https://wa.me/${f.contact}" target="_blank"><button>Chat on WhatsApp</button></a>
+      <p><b>Slots Left:</b> ${slotsLeft}</p>
     `;
     //so you can join the roomates and also  make payment
+    // JOIN logic with approval check
     if (currentUser && currentUser.phone !== f.userPhone) {
+    
+      const requests = JSON.parse(localStorage.getItem("requests") || "[]");
+    
+      const myRequest = requests.find(r =>
+        r.flyerId === f.id && r.phone === currentUser.phone
+      );
+    
       const paymentBtn = document.createElement("button");
-      paymentBtn.textContent = "JOIN";
-      paymentBtn.onclick = () => requestPayment(f.id);
+    
+      if (myRequest?.status === "approved") {
+        paymentBtn.textContent = "APPROVED";
+        paymentBtn.disabled = true;
+        paymentBtn.style.background = "#16a34a";
+      } else if (myRequest?.status === "pending") {
+        paymentBtn.textContent = "PENDING";
+        paymentBtn.disabled = true;
+        paymentBtn.style.background = "#f97316";
+      } else {
+        paymentBtn.textContent = "JOIN";
+        paymentBtn.onclick = () => requestPayment(f.id);
+      }
+    
       flyerEl.appendChild(paymentBtn);
     }
     
@@ -375,14 +627,7 @@ function renderFeed() {
       btnContainer.appendChild(deleteBtn);
       flyerEl.appendChild(btnContainer);
     }
-    // join button for non-owners
-   if (currentUser && currentUser.phone !== f.userPhone){
-    // payement button
-    const paymentBtn = document.createElement("button");
-    paymentBtn.textContent = "JOIN";
-    paymentBtn.onclick = ()=> requestPayment(f.id);
-    btnContainer.appendChild(paymentBtn);
-   }
+   
     feedList.appendChild(flyerEl);
   });
 }
@@ -566,6 +811,7 @@ function showAuth() {
 
   navGuest.classList.remove("hidden");
   navUser.classList.add("hidden");
+  adminSection.classList.add("hidden");
 }
 
 function showRegister() {
@@ -609,6 +855,7 @@ function showFeed() {
   }
 
   renderFeed();
+  renderNotifications();
 }
 
 

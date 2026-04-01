@@ -30,6 +30,7 @@
 <button id="show-hidden-flyers-btn">My Hidden Flyers</button>
 
     </nav>
+    <div id="notification-panel" class="hidden"></div>
   </header>
   <div id="network-status" class="network-status hidden">
     ⚠️ You are offline. Some features may not work.
@@ -83,7 +84,7 @@
         </div>
 
         <div class="image-upload-group">
-          <label>Your profile image:</label>
+          <label>Your profile:</label>
           <input id="f-profile-image" type="file" accept="image/*" />
           <img id="profile-image-preview" class="hidden image-preview" alt="Profile preview" />
         </div>
@@ -137,6 +138,18 @@
     <section id="feed-section" class="card">
       <h2>Flyer Feed</h2>
       <div id="feed-list"></div>
+    </section>
+    <!-- Admin Section -->
+    <section id="admin-section" class="card hidden">
+      <div class="admin-header">
+        <h2>Admin Dashboard</h2>
+        <button id="btn-exit-admin">Exit Admin</button>
+      </div>
+    
+      <div id="admin-analytics" class="admin-analytics"></div>
+    
+      <h3>Payment Requests</h3>
+      <div id="admin-req"></div>
     </section>
   
   </main>
