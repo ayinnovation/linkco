@@ -33,6 +33,11 @@ transform:scale(0.95);
 opacity:1;
 transform:scale(1);
 }
+            }
+@keyframes blink {
+  0% {opacity:0;}
+  50% {opacity:1;}
+  100% {opacity:0;}
 }
             </style>
         </head>
@@ -200,7 +205,7 @@ Share LinkCo with friends so more students can find better hostels.
 
 <input 
 type="text"
-value="Check out LinkCo — Find and review student hostels before anyone else. Join the waitlist:https://linkco-student-housing-network-d3c0a8.netlify.app/waitlist.html"
+value="Check out LinkCo — Find and review student hostels before anyone else. Join the waitlist:https://ayinnovation.github.io/linkco/waitlist.html"
 id="shareLink"
 readonly
 style="width:90%;max-width:500px;padding:10px;border:1px solid #ccc;border-radius:6px;margin-top:15px;"
@@ -243,6 +248,23 @@ Built by a student for students • LinkCo
 </footer>
 
 
+
+<div id="toast" style="
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+background:#111;
+color:white;
+padding:12px 20px;
+border-radius:6px;
+font-size:14px;
+opacity:0;
+pointer-events:none;
+transition:opacity 0.3s ease, bottom 0.3s ease;
+">
+Invite message copied 🎉
+</div>
 <script>
 
 const form = document.getElementById("waitlistForm");
@@ -252,7 +274,7 @@ const submitBtn = document.getElementById("submitBtn");
 form.addEventListener("submit", async function(e){
 
 e.preventDefault();
-submitBtn.innerText = "Joining...";
+submitBtn.innerHTML = "Joining  <span style='animation:blink 1s infinite'>...</span>";
 submitBtn.disabled = true;
 submitBtn.style.opacity = "0.7";
 
@@ -266,77 +288,76 @@ formData.append("school", form.school.value);
 
 const data = formData;
 try {
+  const response = await fetch("https://script.google.com/macros/s/AKfycbzpTEUHuDYGcY-eReNEYF1MD7jtOJ-FikygMhwE59XFXT2MT7fRXiaOddGWqzjoBIsN/exec", {
+    method: "POST",
+    mode: "cors",
+    body: data
+  });
 
-const response = await fetch("https://script.google.com/macros/s/AKfycbzuzjaLac3OjwZfcj6QIkuxBm0uVNN9k_EVSFVIt6KtNHz25mjp-yKwIPW0Tky-kywh/exec",{
-method:"POST",
-mode:"cors",
-body: data
+  const result = await response.json();
 
-});
-const result = await response.json();
+  if (!result || !result.status) {
+    throw new Error("Invalid response from server");
+  }
 
-    if(result.status === "success"){  
+  if (result.status === "success") {
 
-successBox.style.display="block";
-
-errorBox.style.display="none";
-
-form.reset();
-
-setTimeout(()=>{
-successBox.style.display = "none";
-},4000);
-
-setTimeout(()=>{
-window.location.href = "https://chat.whatsapp.com/HBk9Sh2wXDK5QpDmX1xlK1";
-},1500);
-
-}  
-
-else if(result.status === "duplicate"){
-    errorBox.innerText="⚠️ This email already joined the waitlist";
-errorBox.style.display="block";
-successBox.style.display="none";
-setTimeout(()=>{
+    successBox.innerText = "🎉 You're on the waitlist!";
+    successBox.style.display = "block";
     errorBox.style.display = "none";
-},4000);
-  
+
+    form.reset();
+    submitBtn.innerHTML = "join waitlist";
+    submitBtn.disabled = false;
+submitBtn.style.opacity = "1";
+
+    setTimeout(() => {
+      successBox.style.display = "none";
+    }, 4000);
+
+    setTimeout(() => {
+      window.location.href = "https://chat.whatsapp.com/HBk9Sh2wXDK5QpDmX1xlK1";
+    }, 1500);
+
+  } else if (result.status === "duplicate") {
+
+    errorBox.innerText = "⚠️ This email already joined the waitlist";
+    errorBox.style.display = "block";
+    successBox.style.display = "none";
+    submitBtn.innerHTML = "join waitlist";
+    submitBtn.disabled = false;
+submitBtn.style.opacity = "1";
+
+    setTimeout(() => {
+      errorBox.style.display = "none";
+    }, 4000);
+
+  } else {
+    submitBtn.innerHTML = "join waitlist";
+     submitBtn.disabled = false;
+submitBtn.style.opacity = "1";
+
+    throw new Error("Unexpected response");
+   
+  }
+
+} catch (error) {
+
+  errorBox.innerText = "Network error. Try again.";
+  errorBox.style.display = "block";
+  successBox.style.display = "none";
+
+  setTimeout(() => {
+    errorBox.style.display = "none";
+  }, 4000);
+  submitBtn.innerHTML = "join waitlist";
+  submitBtn.disabled = false;
+submitBtn.style.opacity = "1";
+
+
 }
-
-else{
- errorBox.innerText="Something went wrong. Try again.";
-errorBox.style.display="block";
-
-successBox.style.display="none";
-
-setTimeout(()=>{
-errorBox.style.display = "none";
-},4000);
-
-
-} submitBtn.innerText="Join Waitlist";
-submitBtn.disabled=false;
-submitBtn.style.opacity="1";
-} 
-catch(error){
-    errorBox.innerText = "Network error. Try again.";
-    errorBox.style.display="block";
-successBox.style.display="none";
-
-
-setTimeout(()=>{
-errorBox.style.display = "none";
-},4000);
-submitBtn.innerText="Join Waitlist";
-submitBtn.disabled=false;
-submitBtn.style.opacity="1";
-
-}
-
 });
-
 function copyLink(){
-
 const copyText=document.getElementById("shareLink");
 const btn = document.getElementById("copyBtn");
 navigator.clipboard.writeText(copyText.value);
@@ -356,7 +377,7 @@ btn.innerText = "Copy Invite Message";
 async function loadWaitlistCount() {
   try {
 
-    const res = await fetch("https://script.google.com/macros/s/AKfycbzuzjaLac3OjwZfcj6QIkuxBm0uVNN9k_EVSFVIt6KtNHz25mjp-yKwIPW0Tky-kywh/exec", {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbzpTEUHuDYGcY-eReNEYF1MD7jtOJ-FikygMhwE59XFXT2MT7fRXiaOddGWqzjoBIsN/exec", {
       method: "GET",
       mode: "cors"
     });
@@ -376,7 +397,7 @@ async function loadWaitlistCount() {
       throw new Error("No total in response");
     }
 
-    const count = data.total;
+    const count = data.total -3;//adjust for header rows in sheet
 
     document.getElementById("waitlistCount").innerText =
       "🔥 " + count + (count == 1 ? " student" : " students") +
@@ -390,25 +411,9 @@ async function loadWaitlistCount() {
     console.error("Waitlist load error:", e);
   }
 }
-if(navigator.online){
-setInterval(loadWaitlistCount,60000);
-}
+loadWaitlistCount();
+setInterval(loadWaitlistCount,20000);
+
 </script>
-<div id="toast" style="
-position:fixed;
-bottom:30px;
-left:50%;
-transform:translateX(-50%);
-background:#111;
-color:white;
-padding:12px 20px;
-border-radius:6px;
-font-size:14px;
-opacity:0;
-pointer-events:none;
-transition:opacity 0.3s ease, bottom 0.3s ease;
-">
-Invite message copied 🎉
-</div>
 </body>       
 </html>
