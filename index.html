@@ -24,11 +24,23 @@
     </nav>
     <nav id="nav-user" class="hidden">
       <span id="welcome-user"></span>
-      <button id="btn-create-flyer">Create Flyer</button>
-      <button id="btn-search">Search</button>
-      <button id="btn-logout">Logout</button>
-<button id="show-hidden-flyers-btn">My Hidden Flyers</button>
-
+      <div class="nav-primary">
+        <button id="btn-create-flyer" class="primary">Create Flyer</button>
+        <button id="btn-search">Search</button>
+      </div>
+      <div class="nav-secondary">
+        <button id="btn-add-hostel" class="icon-btn" title="Add Hostel">🏠</button>
+        <button id="btn-upgrade">Upgrade</button>
+        <button id="show-hidden-flyers-btn">My Hidden Flyers</button>
+        <button id="btn-logout">Logout</button>
+      </div>
+      <button id="btn-user-menu" class="icon-btn mobile-only" aria-label="Open menu">☰</button>
+      <div id="user-menu-dropdown" class="user-menu-dropdown hidden" role="menu">
+        <button id="btn-menu-add-hostel" type="button">Add Hostel</button>
+        <button id="btn-menu-upgrade" type="button">Upgrade</button>
+        <button id="btn-menu-hidden-flyers" type="button">Hidden Flyers</button>
+        <button id="btn-menu-logout" type="button">Logout</button>
+      </div>
     </nav>
     <div id="notification-panel" class="hidden"></div>
   </header>
@@ -68,15 +80,25 @@
 
     <!-- Create flyer -->
     <section id="flyer-section" class="card hidden">
-      <h2>Create Flyer (₦300)</h2>
+      <div class="section-header">
+        <h2>Create Flyer</h2>
+        <p class="section-subtitle">Share roommates and hostel details in one polished post.</p>
+      </div>
       <div class="form-grid">
-        <input id="f-title" placeholder="Short title (e.g. 3-bed near campus)" />
+        <input id="f-title" placeholder="Hostel Name" />
+        <select id="f-room-type">
+          <option value="">Room Type</option>
+          <option value="2-bed">2 BedRoom</option>
+          <option value="3-bed">3 BedRoom</option>
+          <option value="self-contain">Self Contain</option>
+        </select>
         <input id="f-location" placeholder="Location (e.g. Malete)" />
+        <h3>Pricing</h3>
         <input id="f-total-price" type="number" placeholder="Total price (₦)" />
         <input id="f-per-person" type="number" placeholder="Price per person (₦)" />
         <input id="f-slots-needed" type="number" placeholder="Number of people wanted (2 or 3 etc.)" />
         <input id="f-contact" placeholder="Owner contact number (WhatsApp link uses this)" />
-
+        <h3>Images</h3>
         <div class="image-upload-group">
           <label>Hostel image:</label>
           <input id="f-hostel-image" type="file" accept="image/*" />
@@ -88,14 +110,19 @@
           <input id="f-profile-image" type="file" accept="image/*" />
           <img id="profile-image-preview" class="hidden image-preview" alt="Profile preview" />
         </div>
-
+        <h3>Roommate Preferences</h3>
         <label>Likes / Preferences (comma separated):</label>
         <input id="f-preferences" placeholder="e.g. quiet,non-smoker,early-bird" />
+        <select id="f-gender">
+          <option value=""> Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
       </div>
 
-      <p class="muted">You will be charged ₦300 to upload this flyer (simulated).</p>
+      
       <div class="btn-group">
-  <button id="btn-pay-create">Pay ₦300 & Create Flyer (simulate)</button>
+  <button id="btn-create-flyer-s"> Create Flyer </button>
   <button id="btn-cancel-create" class="secondary">Cancel</button>
 </div>
 
@@ -104,41 +131,159 @@
 </div>
     </section>
 
+    <section id="hostel-section" class="card hidden">
+      <div class="section-header">
+        <h2 id="hostel-form-title">Add New Hostel</h2>
+        <p class="section-subtitle">List safe, affordable hostels with ratings, utilities, and directions.</p>
+      </div>
+      <div class="hostel-form form-grid">
+      <input id="h-name" placeholder="Hostel Name" />
+      <input id="h-location" placeholder="Location (e.g. Malete)" />
+      <input id="h-landmark" placeholder="Closest landmark (e.g. Tipper Garage)" />
+    
+      <h3>Basic Info</h3>
+      <label>Light:</label>
+      <select id="h-light">
+        <option value="">Select</option>
+        <option value="good">Good</option>
+        <option value="average">Average</option>
+        <option value="bad">Bad</option>
+      </select>
+
+      <h3>Utilities</h3>
+      <label>Water:</label>
+      <select id="h-water">
+        <option value="">Select</option>
+        <option value="reliable">Reliable</option>
+        <option value="unstable">Unstable</option>
+      </select>
+    
+      <label>Security:</label>
+      <select id="h-security">
+        <option value="">Select</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+      <h3>Directions</h3>
+      <textarea id="h-directions" placeholder="How to get there..."></textarea>
+      <h3>Images</h3>
+      <div class="image-upload-group">
+        <label>Front view:</label>
+        <input id="h-image-front" type="file" accept="image/*" />
+        <img id="h-image-preview-front" class="hidden image-preview" alt="Front view preview" />
+      </div>
+      <div class="image-upload-group">
+        <label>Compound view:</label>
+        <input id="h-image-compound" type="file" accept="image/*" />
+        <img id="h-image-preview-compound" class="hidden image-preview" alt="Compound view preview" />
+      </div>
+      <div class="image-upload-group">
+        <label>Room view:</label>
+        <input id="h-image-room" type="file" accept="image/*" />
+        <img id="h-image-preview-room" class="hidden image-preview" alt="Room view preview" />
+      </div>
+      </div>
+      <button id="btn-submit-hostel" class="success">Add Hostel</button>
+      <div class="return-btn-wrapper">
+        <button id="btn-hostel-return" class="hidden">Home</button>
+      </div>
+    </section> 
+
+    <!-- Chat Section -->
+    <section id="chat-section" class="card hidden">
+      <div class="section-header">
+        <h2>Chat</h2>
+        <p class="section-subtitle" id="chat-flyer-title"></p>
+      </div>
+
+      <div id="chat-list" class="chat-list"></div>
+
+      <div class="chat-input-row">
+        <input id="chat-input" placeholder="Type a message..." />
+        <button id="chat-send" class="primary">Send</button>
+      </div>
+
+      <div class="return-btn-wrapper">
+        <button id="chat-close" class="hidden">Close Chat</button>
+      </div>
+    </section>
+
     <!-- Search -->
     <section id="search-section" class="card hidden">
-      <h2>Search Roommates (Requires search code)</h2>
-      <div id="search-code-wrapper">
-        <p>Buy a 7-day search access for ₦900 (simulated) to receive a code.</p>
-   
-   
-        <button id="btn-pay-search">Pay ₦900 & Get Code (simulate)</button>
-        <div class="or">OR</div>
-        <input id="search-code-input" placeholder="Enter search code" />
-        <button id="btn-activate-code">Activate code</button>
-  
-        <div id="active-code-info" class="muted hidden"></div>
-  
-      </div>
-      <div id="search-form" class="hidden">
+      <h2>Filter Roommates</h2>
+      <div id="search-form">
         <h3>Filters</h3>
-        <input id="s-max-fund" type="number" placeholder="Max per-person fund (₦)" />
-        <input id="s-people" type="number" placeholder="Number of people in room (2 or 3)" />
+        <p class="muted">Start typing to filter results instantly 🔍</p>
+        <label>Max Budget:</label>
+        <div class="range-group">
+          <input id="s-max-fund" type="range" min="0" max="500000" step="5000" />
+          <input id="budget-input" type="number" placeholder="Enter amount (₦)" />
+        </div>
+        
+        <label>Room Size:</label>
+        <div class="range-group">
+          <input id="s-people" type="range" min="0" max="6" step="1" />
+          <input id="people-input" type="number" placeholder="e.g. 2 or 3" />
+        </div> 
         <input id="s-location" placeholder="Location" />
         <input id="s-preferences" placeholder="Desired preferences (comma separated)" />
         <label><input id="s-student-only" type="checkbox" /> Student only</label>
-        <button id="btn-run-search">Run Search</button>
       </div>
 
-  <button id="s-btn-return-home" class="hidden">Return Home</button>
-
-      <div id="search-results"></div>
+      <button id="s-btn-return-home" class="hidden">Close Filters</button>
     </section>
+
+    <div class="tabs">
+      <button id="tab-flyers" class="active">Roommates</button>
+      <button id="tab-hostels">Hostels</button>
+    </div>
 
     <!-- Feed (public flyers) -->
     <section id="feed-section" class="card">
       <h2>Flyer Feed</h2>
       <div id="feed-list"></div>
     </section>
+   
+    <section id="hostel-feed" class="card">
+      <div class="section-header">
+        <div>
+          <h2>Hostels</h2>
+          <p class="section-subtitle">Filter hostels by location, utilities, and rating.</p>
+        </div>
+        <div class="hostel-filter-panel">
+          <input id="h-search-location" placeholder="Search hostel name" />
+        </div>
+      </div>
+      <div id="hostel-list"></div>
+    </section>
+
+    <div id="hostel-profile-modal" class="hidden review-modal">
+      <div class="review-modal-content">
+        <button id="close-hostel-profile-modal">✖</button>
+        <div id="hostel-profile-content"></div>
+      </div>
+    </div>
+
+    <section id="hidden-flyers-section" class="card hidden">
+      <h3>My Pulled Down Flyers</h3>
+      <div id="hidden-flyers-list"></div>
+      <button onclick="showFeed()">⬅ Back to Feed</button>
+    </section>
+
+    <div id="review-modal" class="hidden review-modal">
+      <div class="review-modal-content">
+    
+        <button id="close-review-modal">
+          ✖
+        </button>
+    
+        <h3>Hostel Reviews</h3>
+    
+        <div id="all-reviews-container"></div>
+    
+      </div>
+    </div>
     <!-- Admin Section -->
     <section id="admin-section" class="card hidden">
       <div class="admin-header">
@@ -153,17 +298,12 @@
     </section>
   
   </main>
-<section id="hidden-flyers-section" style="display:none;">
-  <h3>My Pulled Down Flyers</h3>
-  <div id="hidden-flyers-list"></div>
-  <button onclick="showFeed()">⬅ Back to Feed</button>
-  
-</section>
+
   <footer class="footer">
     <strong>LinkCo — Student Housing Made Simple</strong>
   </footer>
 
   <!-- Main App -->
-  <script src="app.js"></script>
+  <script type = "module" src="app.js"></script>
 </body>
 </html>

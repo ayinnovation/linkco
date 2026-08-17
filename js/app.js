@@ -11,10 +11,10 @@ import {
   adminSection, authSection, btnAddHostelNav, btnCancelCreate, btnContinueGuest,
   btnCreateFlyer, btnExitAdmin, btnHostelReturn, btnLogin, btnLogout, btnPayCreate,
   btnRegister, btnReturnHome, btnSearch, btnShowLogin, btnShowRegister,
-  btnUserMenu, userMenuDropdown, btnMenuAddHostel, btnMenuUpgrade, btnMenuHiddenFlyers, btnMenuLogout,
-  feedSection, flyerSection, hostelFeed, hostelSection, navGuest, navUser,
-  searchSection, hostelProfileModal, closeHostelProfileModal,
-  sBtnReturnHome, showHiddenFlyersBtn, tabFlyers, tabHostels, upgradeBtn
+  feedSection, hostelFeed, hostelSection, navGuest, navUser,
+  searchSection, sBtnReturnHome, showHiddenFlyersBtn, tabFlyers, tabHostels, upgradeBtn,
+  hSearchLocation,
+  hostelProfileModal, hostelProfileContent, closeHostelProfileModal
 } from './js/dom.js';
 
 // Import authentication and session functions
@@ -24,7 +24,7 @@ import { currentUser, registerUser, loginUser, upgradeUser, autoSaveForms, resto
 import { showAuth, showRegister, showLogin, showFeed, showCreateFlyer, showSearch, showAdminDashboard } from './js/navigation.js';
 
 // Import utility functions
-import { safeOn, showNetworkStatus, showNotice } from './js/utils.js';
+import { showLoader, hideLoader, withLoader, safeOn, showNetworkStatus, showNotice } from './js/utils.js';
 
 // Import image preview handler
 import { handleImagePreview } from './js/imagePreview.js';
@@ -37,7 +37,6 @@ import { resetHostelForm, handleHostelSubmit, renderHostels, showAllReviews, add
 
 // Import search functions and slider initializer
 import { initSearchSliders, runSearchLive } from './js/search.js';
-
 // Import admin dashboard functions
 import { renderAdminRequests, renderAdminAnalytics, approveRequest, rejectRequest, renderNotifications, clearNotification } from './js/admin.js';
 
@@ -111,76 +110,107 @@ safeOn(btnExitAdmin, "click", () => {
   if (authSection) authSection.classList.remove("hidden");
 });
 
-// Navigation buttons with instant local state updates
-safeOn(btnShowLogin, "click", showLogin);
+// Navigation buttons with simulated loading spinners
+safeOn(btnShowLogin, "click", () => {
+  showLoader();
+  setTimeout(() => {
+    showLogin();
+    hideLoader();
+  }, 1200);
+});
 
-safeOn(btnShowRegister, "click", showRegister);
+safeOn(btnShowRegister, "click", () => {
+  showLoader();
+  setTimeout(() => {
+    showRegister();
+    hideLoader();
+  }, 1200);
+});
 
-safeOn(btnLogout, "click", logoutUser);
+safeOn(btnLogout, "click", () => {
+  showLoader();
+  setTimeout(() => {
+    logoutUser();
+    hideLoader();
+  }, 1200);
+});
 
-safeOn(btnLogin, "click", loginUser);
+safeOn(btnLogin, "click", () => {
+  showLoader();
+  setTimeout(() => {
+    loginUser();
+    hideLoader();
+  }, 1200);
+});
 
-safeOn(upgradeBtn, "click", upgradeUser);
+safeOn(upgradeBtn, "click", () => {
+  showLoader();
+  setTimeout(() => {
+    upgradeUser();
+    hideLoader();
+  }, 1200);
+});
 
-safeOn(btnRegister, "click", registerUser);
+safeOn(btnRegister, "click", () => {
+  showLoader();
+  setTimeout(() => {
+    registerUser();
+    hideLoader();
+  }, 1200);
+});
 
 // Navigation button to open Create Flyer view
-safeOn(btnCreateFlyer, "click", showCreateFlyer);
+safeOn(btnCreateFlyer, "click", () => {
+  withLoader(showCreateFlyer);
+});
 
 // Navigation button to open Search view
-safeOn(btnSearch, "click", showSearch);
-
-// Mobile menu toggle for smaller screens
-if (btnUserMenu) {
-  safeOn(btnUserMenu, "click", () => {
-    if (userMenuDropdown) {
-      userMenuDropdown.classList.toggle("hidden");
-    }
-  });
-}
-
-// Direct hamburger menu item actions
-safeOn(btnMenuAddHostel, "click", () => {
-  if (userMenuDropdown) userMenuDropdown.classList.add("hidden");
-  if (btnAddHostelNav) btnAddHostelNav.click();
-});
-
-safeOn(btnMenuUpgrade, "click", () => {
-  if (userMenuDropdown) userMenuDropdown.classList.add("hidden");
-  upgradeUser();
-});
-
-safeOn(btnMenuHiddenFlyers, "click", () => {
-  if (userMenuDropdown) userMenuDropdown.classList.add("hidden");
-  renderHiddenFlyers();
-  if (feedSection) feedSection.classList.add("hidden");
-  const hiddenFlyersSection = document.getElementById("hidden-flyers-section");
-  if (hiddenFlyersSection) hiddenFlyersSection.classList.remove("hidden");
-});
-
-safeOn(btnMenuLogout, "click", () => {
-  if (userMenuDropdown) userMenuDropdown.classList.add("hidden");
-  logoutUser();
+safeOn(btnSearch, "click", () => {
+  showLoader();
+  setTimeout(() => {
+    showSearch();
+    hideLoader();
+  }, 1200);
 });
 
 // Return Home buttons
-safeOn(btnReturnHome, "click", showFeed);
+safeOn(btnReturnHome, "click", () => {
+  showLoader();
+  setTimeout(() => {
+    showFeed();
+    hideLoader();
+  }, 1200);
+});
 
-safeOn(sBtnReturnHome, "click", showFeed);
+safeOn(sBtnReturnHome, "click", () => {
+  showLoader();
+  setTimeout(() => {
+    showFeed();
+    hideLoader();
+  }, 1200);
+});
 
 // Cancel Flyer Creation button
 if (btnCancelCreate) {
-  btnCancelCreate.addEventListener("click", showFeed);
+  btnCancelCreate.addEventListener("click", () => {
+    showLoader();
+    setTimeout(() => {
+      showFeed();
+      hideLoader();
+    }, 1200);
+  });
 }
 
 // Show Hidden Flyers button
 safeOn(showHiddenFlyersBtn, "click", () => {
-  renderHiddenFlyers();
-  if (feedSection) feedSection.classList.add("hidden");
-  const hiddenFlyersSection = document.getElementById("hidden-flyers-section");
-  if (hiddenFlyersSection) {
-    hiddenFlyersSection.classList.remove("hidden");
-  }
+  showLoader();
+  setTimeout(() => {
+    renderHiddenFlyers();
+    if (feedSection) feedSection.classList.add("hidden");
+    const hiddenFlyersSection = document.getElementById("hidden-flyers-section");
+    if (hiddenFlyersSection) hiddenFlyersSection.style.display = "block";
+    hideLoader();
+  }, 1200);
 });
 
 // Close Review Modal button listener
@@ -221,7 +251,9 @@ window.addEventListener("online", () => {
 
 // Pay & Create Flyer submit button listener attached on DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
-  safeOn(btnPayCreate, "click", createFlyer);
+  safeOn(btnPayCreate, "click", () => {
+    withLoader(createFlyer);
+  });
 });
 
 // ==========================================
@@ -238,7 +270,7 @@ restoreFormData();
 // Initialize range slider sync and search listeners
 initSearchSliders();
 
-// Initialize hostel filter listeners and render filtered hostels
+// Initialize hostel filter listeners and render the current hostel list
 initHostelFilters();
 runHostelSearch();
 
